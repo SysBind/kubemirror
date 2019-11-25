@@ -21,7 +21,8 @@ import (
 	"path/filepath"
 	//	"time"
 
-	//	v1 "k8s.io/api/core/v1"
+	"github.com/sysbind/kubemirror/internal/copy"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -59,6 +60,15 @@ func main() {
 		}
 	}
 	fmt.Printf("Packing objects from %s\n", ns.GetName())
+
+	var secrets *v1.SecretList
+	secrets, err = clientset.CoreV1().Secrets(*namespace).List(metav1.ListOptions{})
+	copy.PackSecrets(secrets)
+
+	var configmaps *v1.ConfigMapList
+	configmaps, err = clientset.CoreV1().ConfigMaps(*namespace).List(metav1.ListOptions{})
+
+	copy.PackConfigMaps(configmaps)
 }
 
 func setupKubeConnection(kubeconfig string) *kubernetes.Clientset {

@@ -21,4 +21,5 @@ Currently no data is being copied.
 - ingress - copy
 - configmap - copy
 - secret - copy
-- persistentVolumeClaim
+- persistentVolumeClaim - copy
+- persistentVolume - copy ? (definition only, no data)
