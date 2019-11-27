@@ -22,6 +22,7 @@ import (
 	//	"time"
 
 	"github.com/sysbind/kubemirror/internal/copy"
+	k8sbinary "github.com/sysbind/kubemirror/pkg/binary"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,6 +62,9 @@ func main() {
 	}
 	fmt.Printf("Packing objects from %s\n", ns.GetName())
 
+	kctl := k8sbinary.Kubectl{"/usr/bin/kubectl", kubeconfig}
+	packer := copy.Packer{namespace, kctl}
+
 	var secrets *v1.SecretList
 	secrets, err = clientset.CoreV1().Secrets(*namespace).List(metav1.ListOptions{})
 	copy.PackSecrets(secrets)
@@ -68,7 +72,7 @@ func main() {
 	var configmaps *v1.ConfigMapList
 	configmaps, err = clientset.CoreV1().ConfigMaps(*namespace).List(metav1.ListOptions{})
 
-	copy.PackConfigMaps(configmaps)
+	packer.PackConfigMaps(configmaps)
 }
 
 func setupKubeConnection(kubeconfig string) *kubernetes.Clientset {
